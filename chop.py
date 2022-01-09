@@ -21,7 +21,7 @@ class chop: #This program fundamentally runs on OOP. The entirety of the game is
         file2 = open("take.txt","r") #This file is used for the offensive portion of the AI. It keeps track of which gamestates to chase after if at all possible.
         file3 = open("win.txt","r") #This file is used for the offensive portion of the AI as well. It keeps track of which gamestates give the AI an option to create a gamestate in take.txt (the above list).
         self.player="AI" #This is the default in case the line below is commented out for AI training mode. Otherwise, it does not matter.
-        #self.player=input("Type AI to have the AI play for you. Otherwise, press ENTER.\n") #Comment out this line for AI training mode. It will suppress all print statements and have the AI play against a randomly-acting AI (with all legal moves of course)
+        self.player=input("Type AI to have the AI play for you. Otherwise, press ENTER.\n") #Comment out this line for AI training mode. It will suppress all print statements and have the AI play against a randomly-acting AI (with all legal moves of course)
         self.hands=[1,1,1,1] #This variable keeps track of the gamestate. The first 2 numbers are the player's hands, and the second 2 are the AI's hands.
         self.tCount=0 #Turn count
         self.moves=['tlwl','tlwr','trwl','trwr','s11','s02','s12','s03','s13','s22','s04','s14','s23','s24','s33','concede'] #All possible moves. They are explained further below.
