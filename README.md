@@ -1,1 +1,2 @@
-# programming-projects
+My name is Joshua Crisafi, and I love to code. This is where I will publish my personal programming projects whenever I have time to work on and finish them. Please feel free to reach out to me at joshuacrisafi@gmail.com to let me know what you think. As of now, the only project posted here is my Chopsticks AI, but if you're reading this well after I've posted it then there will almost certainly be more.
+It should be noted that I don't know much of anything about github, so do forgive me if I've done something wrong here. I am using this primarily to put all of my projects in one place. The intention is that you copy the code from here and run it on your own computer.
