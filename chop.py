@@ -123,7 +123,7 @@ class chop: #This program fundamentally runs on OOP. The entirety of the game is
                 negative="will not"
             else:
                 negative="may"
-            print(f"You lost in {self.tCount} turn{plural}! The AI {maybe} be changed.")
+            print(f"You lost in {self.tCount} turn{plural}! The AI {negative} be changed.")
         quit()
     def validSplit(self,command,person="player",state=[]): #Determines whether or not a split is valid for the given player and in the given gamestate.
         if(state==[]):
