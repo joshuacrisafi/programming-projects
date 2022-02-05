@@ -111,7 +111,10 @@ class Term: #a term is a product of factor functions (each with its own exponent
                         else:
                             denominator+="*"+termList[i]+"^"+str(-expo)
             if(numerator=="" or numerator=="-"):
-                numerator+="1"
+                if(sofar==""):
+                    numerator+="1"
+                else:
+                    numerator+="*1"
             if(denominator==""):
                 sofar+=numerator
             else:
