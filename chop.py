@@ -283,10 +283,7 @@ class chop: #This program fundamentally runs on OOP. The entirety of the game is
                     self.takeInput()
     def pTurn(self): #Start of your turn (before input received)
         self.tCount+=1
-        if(self.tCount>20): #This part is important. Because of the intensive nature of the program, it can easily and unavoidably overload the stack.
-#Because of this, a TCL (turn count limit) is imposed here, though the number of turns before the code crashes is dynamic and slightly unpredictable from game to game.
-#Many concessions were made in the interest of raising this number. Originally, the AI was coded to try and finish off the player in the least number of moves.
-#Beause this kept the TCL too low, however, this feature was removed. Raise or lower this number at your own risk.
+        if(self.tCount>20): #The turn count limit, imposed to keep all games of AI vs. AI within a set time constraint
             if(self.player==""):
                 print("Maximum number of turns reached. Stalemate declared. Victory is awarded to the AI.")
             self.youLose("concede")
