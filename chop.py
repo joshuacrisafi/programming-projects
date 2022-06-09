@@ -41,9 +41,10 @@ class chop: #This program fundamentally runs on OOP. The entirety of the game is
         self.oLast=[1,1,1,1] #keeps track of positions so the AI can learn what it did right/wrong
         self.cur=list(range(len(self.moves)-1)) #This list is used to have the AI randomly select a move (the -1 is to prevent it from selecting "concede" at the end of self.moves)
         if(self.goFirst()):
-            self.pTurn()
+            while(True):
+                self.pTurn()
         else:
-            self.oTurn()
+            self.oTurn("finish",False)
     def goFirst(self):
         if(self.player==""): #If PLAYER is playing
             return input("Who will go first? (me/you only): \n")=="me"
@@ -173,7 +174,7 @@ class chop: #This program fundamentally runs on OOP. The entirety of the game is
         self.cur=list(range(len(self.moves)-1)) #for self.oTurn() below
         self.oLast=self.hands.copy()
         self.oTurn()
-    def oTag(self,command): #Called to execute the given tag command on AI's turn.
+    def oTag(self,command,regular=True): #Called to execute the given tag command on AI's turn.
         if(command[3]=='l'):
             From=2
         else:
@@ -184,7 +185,9 @@ class chop: #This program fundamentally runs on OOP. The entirety of the game is
             To=1
         self.hands[To]+=self.hands[From]
         self.bal()
-        self.pTurn()
+        if(not regular):
+            while(True):
+                self.pTurn()
     def pSplit(self,command): #Called to execute the given split command on PLAYER's turn.
         self.hands[0]=int(command[1])
         self.hands[1]=int(command[2])
@@ -192,11 +195,13 @@ class chop: #This program fundamentally runs on OOP. The entirety of the game is
         self.cur=list(range(len(self.moves)-1))
         self.oLast=self.hands.copy()
         self.oTurn()
-    def oSplit(self,command): #Called to execute the given split command on AI's turn.
+    def oSplit(self,command,regular=True): #Called to execute the given split command on AI's turn.
         self.hands[2]=int(command[1])
         self.hands[3]=int(command[2])
         self.bal()
-        self.pTurn()
+        if(not regular):
+            while(True):
+                self.pTurn()
     def oApply(self,command,state=[]): #Called to hypothetically determine the gamestate if the AI were to make the given move without actually making it (this function does not alter the actual gamestate)
         if(state==[]):
             state=self.hands
@@ -283,10 +288,6 @@ class chop: #This program fundamentally runs on OOP. The entirety of the game is
                     self.takeInput()
     def pTurn(self): #Start of your turn (before input received)
         self.tCount+=1
-        if(self.tCount>20): #The turn count limit, imposed to keep all games of AI vs. AI within a set time constraint
-            if(self.player==""):
-                print("Maximum number of turns reached. Stalemate declared. Victory is awarded to the AI.")
-            self.youLose("concede")
         self.cur=list(range(len(self.moves)-1)) #initialized for self.takeInput() below
         self.pLast=self.hands.copy() #saves a copy of the gamestate
         if(self.player==""): #PLAYER interface
@@ -301,11 +302,11 @@ class chop: #This program fundamentally runs on OOP. The entirety of the game is
             return(self.validTag(command,player,state))
         else:
             return(self.validSplit(command,player,state))
-    def oDo(self,command): #do the given command for the opponent
+    def oDo(self,command,regular=True): #do the given command for the opponent
         if(command[0]=="t"):
-            self.oTag(command)
+            self.oTag(command,regular)
         else:
-            self.oSplit(command)
+            self.oSplit(command,regular)
     def pOptions(self,state): #returns a list of possible player moves starting at the given state
         options=[]
         nonConcede=self.moves.copy()
@@ -333,7 +334,7 @@ class chop: #This program fundamentally runs on OOP. The entirety of the game is
                 if(str(mod3) not in self.take):
                     self.take.append(str(mod3))
         return check
-    def oTurn(self,type="finish"): #opponent's turn (where most of the opponent AI stuff happens)
+    def oTurn(self,type="finish",regular=True): #opponent's turn (where most of the opponent AI stuff happens)
         if(len(self.cur)==0): #if the current "type" has no possible moves, roll over to the next one (finish->offense->defense->survival).
 #Finish mode is where the AI tries to make a move that defeats the PLAYER instantly (not in several moves).
 #Offense mode is where the AI tries to make a move that assures the AI's eventual victory.
@@ -341,9 +342,9 @@ class chop: #This program fundamentally runs on OOP. The entirety of the game is
 #Survival mode is where the AI gives up and uses any valid move.
             if(type=="offense"):
                 self.cur=list(range(len(self.moves)-1)) #re-initializes self.cur before calling itself in the next type
-                self.oTurn("defense")
-            elif(type=="defense"): #If the AI finds itself unable to defend in a given position, that must mean that that position that its previous move was a mistake (or it had been trapped for several moves).
-#So it adds the last recorded gamestate before the PLAYER moved (and all equivalent permutations) to self.avoid so that it does not make the same mistake again.
+                self.oTurn("defense",regular)
+            elif(type=="defense"): #If the AI finds itself unable to defend in a given position, that must mean that that position that its previous move was a mitake (or it had been trapped for several moves).
+#So it adds the last recorded gamestate before the PLAYER moved (and all equivalent permutations) to self.avoid so that it does not make the same mitake again.
                 if(str(self.pLast) not in self.avoid):
                     self.avoid.append(str(self.pLast))
                     mod1=[self.pLast[1],self.pLast[0],self.pLast[2],self.pLast[3]]
@@ -356,23 +357,23 @@ class chop: #This program fundamentally runs on OOP. The entirety of the game is
                     if(str(mod3) not in self.avoid):
                         self.avoid.append(str(mod3))
                 self.cur=list(range(len(self.moves)-1))
-                self.oTurn("survival")
+                self.oTurn("survival",regular)
             else: #In the case of type=="finish":
                 self.cur=list(range(len(self.moves)-1))
-                self.oTurn("offense")
+                self.oTurn("offense",regular)
         else:
             ran=random.choice(self.cur)
             command=self.moves[ran]
             if(not self.validityCheck(command)): #invalid move
                 self.cur.remove(ran)
-                self.oTurn(type)
+                self.oTurn(type,regular)
             else:
                 if(type=="defense"):
                     if(str(self.oApply(command)) in self.avoid):
                         self.cur.remove(ran)
-                        self.oTurn("defense")
+                        self.oTurn("defense",regular)
                     else:
-                        self.oDo(command)
+                        self.oDo(command,regular)
                 elif(type=="offense"):
                     if(str(self.oApply(command)) in self.take): #if the given move would create a gamestate known to assure victory
                         if(str(self.hands) not in self.win): #adds the pre-move gamestate to self.win
@@ -386,19 +387,20 @@ class chop: #This program fundamentally runs on OOP. The entirety of the game is
                                 self.win.append(str(mod2))
                             if(str(mod3) not in self.win):
                                 self.win.append(str(mod3))
-                        self.oDo(command)
+                        self.oDo(command,regular)
                     elif(self.takeTest(self.oApply(command))): #just because the resulting gamestate isn't in self.take doesn't mean it shouldn't be. This line tests that and adds it if belongs there.
-                        self.oDo(command)
+                        self.oDo(command,regular)
                     else:
                         self.cur.remove(ran)
-                        self.oTurn("offense")
+                        self.oTurn("offense",regular)
                 elif(type=="finish"):
                     result=self.oApply(command)
                     if(result[0]==0 and result[1]==0): #only agree to the move if it defeats PLAYER
-                        self.oDo(command)
+                        self.oDo(command,regular)
                     else:
                         self.cur.remove(ran)
-                        self.oTurn("finish")
+                        self.oTurn("finish",regular)
                 else:
-                    self.oDo(command)
+                    self.oDo(command,regular)
+
 chop=chop() #calls the entire program by initializing an instance of the class.
